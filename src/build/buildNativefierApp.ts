@@ -1,18 +1,19 @@
 import * as path from 'path';
 
 import * as electronGet from '@electron/get';
-import * as electronPackager from 'electron-packager';
-import * as hasbin from 'hasbin';
+import electronPackager from 'electron-packager';
 import * as log from 'loglevel';
 
 import { convertIconIfNecessary } from './buildIcon';
 import {
   copyFileOrDir,
   getTempDir,
+  hasWine,
   isWindows,
   isWindowsAdmin,
 } from '../helpers/helpers';
-import { AppOptions, NativefierOptions } from '../options/model';
+import { useOldAppOptions, findUpgradeApp } from '../helpers/upgrade/upgrade';
+import { AppOptions, RawOptions } from '../../shared/src/options/model';
 import { getOptions } from '../options/optionsMain';
 import { prepareElectronApp } from './prepareElectronApp';
 
@@ -24,28 +25,6 @@ const OPTIONS_REQUIRING_WINDOWS_FOR_WINDOWS_BUILD = [
   'versionString',
   'win32metadata',
 ];
-
-/**
- * Checks the app path array to determine if packaging completed successfully
- */
-function getAppPath(appPath: string | string[]): string {
-  if (!Array.isArray(appPath)) {
-    return appPath;
-  }
-
-  if (appPath.length === 0) {
-    return null; // directory already exists and `--overwrite` not set
-  }
-
-  if (appPath.length > 1) {
-    log.warn(
-      'Warning: This should not be happening, packaged app path contains more than one element:',
-      appPath,
-    );
-  }
-
-  return appPath[0];
-}
 
 /**
  * For Windows & Linux, we have to copy over the icon to the resources/app
@@ -65,7 +44,18 @@ async function copyIconsIfNecessary(
     options.packager.platform === 'darwin' ||
     options.packager.platform === 'mas'
   ) {
-    log.debug('No copying necessary on macOS; aborting');
+    if (options.nativefier.tray !== 'false') {
+      //tray icon needs to be .png
+      log.debug('Copying icon for tray application');
+      const trayIconFileName = `tray-icon.png`;
+      const destIconPath = path.join(appPath, 'icon.png');
+      await copyFileOrDir(
+        `${path.dirname(options.packager.icon)}/${trayIconFileName}`,
+        destIconPath,
+      );
+    } else {
+      log.debug('No copying necessary on macOS; aborting');
+    }
     return;
   }
 
@@ -77,12 +67,43 @@ async function copyIconsIfNecessary(
   await copyFileOrDir(options.packager.icon, destIconPath);
 }
 
-function trimUnprocessableOptions(options: AppOptions): void {
+/**
+ * Checks the app path array to determine if packaging completed successfully
+ */
+function getAppPath(appPath: string | string[]): string | undefined {
+  if (!Array.isArray(appPath)) {
+    return appPath;
+  }
+
+  if (appPath.length === 0) {
+    return undefined; // directory already exists and `--overwrite` not set
+  }
+
+  if (appPath.length > 1) {
+    log.warn(
+      'Warning: This should not be happening, packaged app path contains more than one element:',
+      appPath,
+    );
+  }
+
+  return appPath[0];
+}
+
+function isUpgrade(rawOptions: RawOptions): boolean {
   if (
-    options.packager.platform === 'win32' &&
-    !isWindows() &&
-    !hasbin.sync('wine')
+    rawOptions.upgrade !== undefined &&
+    typeof rawOptions.upgrade === 'string' &&
+    rawOptions.upgrade !== ''
   ) {
+    rawOptions.upgradeFrom = rawOptions.upgrade;
+    rawOptions.upgrade = true;
+    return true;
+  }
+  return false;
+}
+
+function trimUnprocessableOptions(options: AppOptions): void {
+  if (options.packager.platform === 'win32' && !isWindows() && !hasWine()) {
     const optionsPresent = Object.entries(options)
       .filter(
         ([key, value]) =>
@@ -99,17 +120,36 @@ function trimUnprocessableOptions(options: AppOptions): void {
       'features, like a correct icon and process name. Do yourself a favor and install Wine, please.',
     );
     for (const keyToUnset of optionsPresent) {
-      options[keyToUnset] = null;
+      (options as unknown as Record<string, undefined>)[keyToUnset] = undefined;
     }
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function buildNativefierApp(
-  rawOptions: NativefierOptions,
-): Promise<string> {
-  log.info('Processing options...');
+  rawOptions: RawOptions,
+): Promise<string | undefined> {
+  log.info('\nProcessing options...');
+
+  if (isUpgrade(rawOptions)) {
+    log.debug('Attempting to upgrade from', rawOptions.upgradeFrom);
+    const oldApp = findUpgradeApp(rawOptions.upgradeFrom as string);
+    if (oldApp === null) {
+      throw new Error(
+        `Could not find an old Nativfier app in "${
+          rawOptions.upgradeFrom as string
+        }"`,
+      );
+    }
+    rawOptions = useOldAppOptions(rawOptions, oldApp);
+    if (rawOptions.out === undefined && rawOptions.overwrite) {
+      rawOptions.out = path.dirname(rawOptions.upgradeFrom as string);
+    }
+  }
+  log.debug('rawOptions', rawOptions);
+
   const options = await getOptions(rawOptions);
+  log.debug('options', options);
 
   if (options.packager.platform === 'darwin' && isWindows()) {
     // electron-packager has to extract the desired electron package for the target platform.

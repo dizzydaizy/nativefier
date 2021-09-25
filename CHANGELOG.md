@@ -1,4 +1,192 @@
 
+45.0.4 / 2021-09-24
+===================
+
+  * Actually actually (TM) include lockfile in npm artifacts, duuuuuh
+
+45.0.3 / 2021-09-24
+===================
+
+  * Actually include package-lock.json in npm artifacts, duh
+
+45.0.2 / 2021-09-24
+===================
+
+  * Fix regressions in opening windows/tabs, update browser versions (PR #1284)
+  * Make macOS "bundle identifier" mention Nativefier (fix #866) (PR #1259)
+  * Maintenance: Work around yargs coerce issue (PR #1283)
+
+45.0.1 / 2021-09-20
+===================
+
+  * Auto-internal login pages: add `(id|auth).atlassian.com` (fix #1265)
+  * API.md: document need to use CSS `!important` keyword (fix #1264)
+  * Bump default Electron to 13.4.0 with security fixes
+  * Maintenance: deps bumps, fix build:watch script, re-introduce a lockfile
+
+45.0.0 / 2021-07-19
+===================
+
+  * **[BREAKING]** Bump default Electron to 13.1.7 with Chrome 91 (PR #1230)
+    See https://www.electronjs.org/blog/electron-13-0
+    and https://www.electronjs.org/blog/electron-13-0#breaking-changes
+
+44.0.7 / 2021-07-10
+===================
+
+  * Fix badge/counter icon not being removed correctly (#1251, PR #1252)
+  * App context menu: add "Save Image", "Copy Image", "Copy Image Address" (PR #1256)
+  * Bump default Electron from 12.0.12 to 12.0.14. Changelogs:
+    [Electron 12.0.13](https://github.com/electron/electron/releases/tag/v12.0.13)
+    [Electron 12.0.14](https://github.com/electron/electron/releases/tag/v12.0.14)
+  * Maintenance: {API.md, HACKING.md} documentation, improve `generate-changelog`
+
+44.0.6 / 2021-06-26
+===================
+
+Like 44.0.4, this release only contains one behind-the-scenes TS change with no user-visible changes.
+It is here to let us narrow down on potential regressions that may have crept in.
+It isn't especially scary, though. Do test it, use it, and report regressions!
+
+  * App: Enable TypeScript `strict:true`, more typescript-eslint rules, shared TS project (#1231)
+
+44.0.5 / 2021-06-25
+===================
+
+  * Fix "Reset Zoom" menu item (#1241, PR #1243)
+  * Fix `--tray start-in-tray` (#1225, PR #1235)
+  * Fix external URLs opening in a new Nativefier tab (#1228, PR #1229)
+  * Bump default Electron from 12.0.11 to 12.0.12. See changelog:
+    [Electron 12.0.12](https://github.com/electron/electron/releases/tag/v12.0.12)
+  * Maintenance: documentation
+
+44.0.4 / 2021-06-15
+===================
+
+This release only contains one behind-the-scenes TS change with no user-visible changes.
+It is here to let us narrow down on potential regressions that may have crept in.
+It isn't especially scary, though. Do test it, use it, and report regressions!
+
+  * Enable TypeScript `strict:true`, and more typescript-eslint rules (#1223)
+
+44.0.3 / 2021-06-15
+===================
+
+  * Make CSS injection less brutal (#1222, #1227)
+  * Maintenance: README nits, Fix gitcloud 0.2.3 import
+
+44.0.2 / 2021-06-07
+===================
+
+  * Fix HTTP basic auth broken since 44.0.1 (fix #1219) (#1220)
+  * Fix tabs opening twice since 44.0.0 (fix #1209) (#1221)
+
+44.0.1 / 2021-06-07
+===================
+
+  * macOS: fix crash on activating main window (fix #1212) (PR #1213)
+  * macOS: fix fullscreen not working + menu refactor (fix #1206) (PR #1210)
+
+44.0.0 / 2021-06-04
+===================
+
+  * **[BREAKING]** Nativefier now requires node>=12.9 and npm>=6.9 (#1192)
+    We do our best to support the oldest Node we can (what Debian stable ships),
+    but we are also constrained by what our _own_ Node dependencies require.
+    Now is the time for a bump.
+
+  * Feature: Provide easy-to-use user-agent shortcodes (e.g. `firefox`) (#1198)
+  * Feature: Organize CLI flags into groups (for better `--help` usability) (#1191)
+
+  * Fix broken window popups (fix #1197, PR #1203)
+  * Fix allowing non-ascii app names like 微信读书 (fix #1056, PR #1207)
+  * Fix considering `login.microsoftonline.com` as internal login page (#1205)
+  * Bump default Electron from 12.0.7 to 12.0.10 with a couple of fixes. See changelogs for:
+    [12.0.8](https://github.com/electron/electron/releases/tag/v12.0.8),
+    [12.0.9](https://github.com/electron/electron/releases/tag/v12.0.9),
+    [12.0.10](https://github.com/electron/electron/releases/tag/v12.0.10).
+
+  * Maintenance: docs, tests tooling, deps bumps
+
+43.1.3 / 2021-05-15
+===================
+
+👋 dear users. Two announcements in this release:
+
+**This release (43.1.3) is the last release supporting Node 10.x**
+We do our best to support the oldest Node we can (what Debian stable ships),
+but we are also constrained by what our _own_ Node dependencies require.
+It's time for a bump; the next release will be 44.0.0 and will require Node 12.
+
+Also, introducing **[CATALOG.md](https://github.com/nativefier/nativefier/blob/master/CATALOG.md),**
+**a list of build commands contributed by the Nativefier community**, to help you
+nativefy "complicated" apps that need a bit of elbow grease to work.
+When stuck nativefying a specific site, go take a look, it might give you ideas :) .
+
+  * Fix crash on tab close (only try to inject CSS for valid web requests) (#939, PR #1181)
+  * Fix considering `shop.foo.com` and `blog.foo.com` as internal (PR #1171)
+  * CATALOG.md: build command library (fix #1166) (PR #1178)
+  * Bump to Electron 12.0.7
+
+43.1.2 / 2021-05-03
+===================
+
+  * Fix logging out users on upgrade / app recreate with same URL (fix #1176) (PR #1179)
+
+43.1.1 / 2021-05-02
+===================
+
+  * Fix crash in `preload.js` due to 3rd-party 'loglevel' (fix #1175, fix #1176) (PR #1177)
+
+43.1.0 / 2021-05-01
+===================
+
+This is a chunky release! Warm thanks to all the contributors that helped shape it,
+with a special shoutout to @TheCleric for a mountain of awesome work.
+
+Features! (nothing breaking)
+
+  * Add a [`--upgrade`](https://github.com/nativefier/nativefier/blob/master/API.md#upgrade) option to easily upgrade an existing app (fix #1131) (PR #1138)
+  * Support defining a custom [`--bookmarks-menu`](https://github.com/nativefier/nativefier/blob/master/API.md#bookmarks-menu) (fix #1065) (PR #1155)
+  * Support setting apps [`--lang`](https://github.com/nativefier/nativefier/blob/master/API.md#lang)uage (fix #175) (PR #1173)
+  * Support creating self-contained "[`--portable`](https://github.com/nativefier/nativefier/blob/master/API.md#portable)" apps writing their app data to the app folder (fix #376) (PR #1168)
+  * Support opening URLs passed as arg to Nativefied apps (fix #405) (PR #1154)
+  
+Bugfixes!
+
+  * App: fix child windows not inheriting mainWindow properties (including userAgent), breaking some Google login pages (#1174)
+  * Fix `--inject`ing multiple css/js files (fix #458) (#1162)
+  * Fix `--widevine` by properly listening to `widevine-...` events (fix #1153) (PR #1164)
+  * Prompt to confirm when page is attempting to prevent unload (#1163)
+  * macOS: Fix crash when using `--tray` (fix #527) (PR #1156)
+  * macOS: Fix invisible icon (fix #942, fix #668) (PR #1156)
+  * Auto-internal login pages: add a missing Google login page (#1167)
+
+Maintenance!
+
+  * Bump to [Electron 12.0.6](https://github.com/electron/electron/releases/tag/v12.0.6) with Chrome 89.0.4389.128 and security fixes
+  * Docs: add troubleshooting section for common issues (#1169), document signing `--widevine` apps like HBO Max & Udemy (#1147), misc fixes
+  * App: replace console.xyz calls with loglevel.xyz, with a level controlled by app argv `--verbose` (#1172)
+  * Auto-internal login pages: add test to ensure we don't regress on cases of SLDs
+  * CI: run in node 16, drop node 15. Run less node versions for faster CI; oldest supported / latest is enough
+
+43.0.2 / 2021-04-13
+===================
+
+  * Bump default Electron to 12.0.4 with Chrome 89.0.4389.114
+    This includes the recent security fixes.
+    See https://github.com/electron/electron/releases/tag/v12.0.3
+    and https://github.com/electron/electron/releases/tag/v12.0.4
+
+43.0.1 / 2021-04-11
+===================
+
+  * Add a `session-interaction` event to allow injected js to interact
+    with apps Electron `session` object (PR #1132)
+  * Automatically-internal login pages: add Apple ID (PR #1146), GitHub 2FA (PR #1140)
+  * Bump default Electron from 12.0.1 to 12.0.2 (with Chrome 89.0.4389.90)
+  * Old build detection: bump old build threshold from 60 to 90 days
+
 43.0.0 / 2021-03-10
 ===================
 
@@ -87,7 +275,7 @@ This release includes several contributor patches. Thanks @sorhtyre @mattruzzi !
 
   * **[BREAKING CHANGE] Warn on old Electron/Chrome (fix #556) (PR #1076)**
     ⚠️ Users packaging kiosk apps running for a long time on internal websites,
-    see https://github.com/nativefier/nativefier/blob/master/docs/api.md#disable-old-build-warning-yesiknowitisinsecure
+    see https://github.com/nativefier/nativefier/blob/master/API.md#disable-old-build-warning-yesiknowitisinsecure
   * Check for improperly-formatted arguments (fix #885) (PR #1080)
   * Correctly start in tray when both `--maximize` and `--tray start-in-tray` are passed (fix #1015) (PR #1079)
   * Fix icon path error when passing asar `--conceal` flag (fix #975) (PR #1074)

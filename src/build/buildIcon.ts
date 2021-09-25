@@ -7,8 +7,9 @@ import {
   convertToPng,
   convertToIco,
   convertToIcns,
+  convertToTrayIcon,
 } from '../helpers/iconShellHelpers';
-import { AppOptions } from '../options/model';
+import { AppOptions } from '../../shared/src/options/model';
 
 function iconIsIco(iconPath: string): boolean {
   return path.extname(iconPath) === '.ico';
@@ -44,8 +45,8 @@ export function convertIconIfNecessary(options: AppOptions): void {
       const iconPath = convertToIco(options.packager.icon);
       options.packager.icon = iconPath;
       return;
-    } catch (error) {
-      log.warn('Failed to convert icon to .ico, skipping.', error);
+    } catch (err: unknown) {
+      log.warn('Failed to convert icon to .ico, skipping.', err);
       return;
     }
   }
@@ -62,8 +63,8 @@ export function convertIconIfNecessary(options: AppOptions): void {
       const iconPath = convertToPng(options.packager.icon);
       options.packager.icon = iconPath;
       return;
-    } catch (error) {
-      log.warn('Failed to convert icon to .png, skipping.', error);
+    } catch (err: unknown) {
+      log.warn('Failed to convert icon to .png, skipping.', err);
       return;
     }
   }
@@ -72,7 +73,6 @@ export function convertIconIfNecessary(options: AppOptions): void {
     log.debug(
       'Building for macOS and icon is already a .icns, no conversion needed',
     );
-    return;
   }
 
   if (!isOSX()) {
@@ -83,12 +83,15 @@ export function convertIconIfNecessary(options: AppOptions): void {
   }
 
   try {
-    const iconPath = convertToIcns(options.packager.icon);
-    options.packager.icon = iconPath;
-    return;
-  } catch (error) {
-    log.warn('Failed to convert icon to .icns, skipping.', error);
+    if (!iconIsIcns(options.packager.icon)) {
+      const iconPath = convertToIcns(options.packager.icon);
+      options.packager.icon = iconPath;
+    }
+    if (options.nativefier.tray !== 'false') {
+      convertToTrayIcon(options.packager.icon);
+    }
+  } catch (err: unknown) {
+    log.warn('Failed to convert icon to .icns, skipping.', err);
     options.packager.icon = undefined;
-    return;
   }
 }

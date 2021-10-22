@@ -51,7 +51,7 @@
     "watch": "npx concurrently \"npm:*:watch\""
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.22.0",
     "commander": "^7.1.0",
     "electron-packager": "^15.2.0",
     "gitcloud": "^0.2.0",
